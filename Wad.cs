@@ -1,3 +1,6 @@
+/*==== Wad.cs        < coded with love by scump smallbrain />
+    code for reading id's WAD format. [[https://doomwiki.org/wiki/WAD]]
+============================================================== */
 namespace ScumpDoom;
 
 public partial class SD

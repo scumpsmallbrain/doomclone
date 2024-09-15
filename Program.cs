@@ -1,4 +1,7 @@
-﻿using Raylib_CSharp.Windowing;
+﻿/*==== Program.cs        < coded with love by scump smallbrain />
+    entry-point of the program. hosts the init process & main loop
+============================================================== */
+using Raylib_CSharp.Windowing;
 
 namespace ScumpDoom;
 
@@ -13,6 +16,9 @@ public partial class SD
     {
         V.Init();
 
+        /* all systems nominal */
+
+        /* thunderbirds are go */
         DoomLoop();
     }
 

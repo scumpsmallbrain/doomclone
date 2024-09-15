@@ -1,3 +1,7 @@
+/*==== Helper.cs        < coded with love by scump smallbrain />
+    static functions in the SD class for general use.
+============================================================== */
+
 namespace ScumpDoom;
 
 public partial class SD {
