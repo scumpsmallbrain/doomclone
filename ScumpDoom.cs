@@ -6,7 +6,7 @@ using Raylib_CSharp.Windowing;
 namespace ScumpDoom;
 
 /* SD : ScumpDoom */
-public partial class SD
+public static partial class SD
 {
 
     public const string V_NUMBER = "v0.0.0";
@@ -14,9 +14,10 @@ public partial class SD
 
     public static void Main(string[] args)
     {
+        WAD.Init();
         V.Init();
 
-        /* all systems nominal */
+        /* all systems nominal*/
 
         /* thunderbirds are go */
         DoomLoop();

@@ -13,7 +13,7 @@ using Raylib_CSharp.Windowing;
 namespace ScumpDoom;
 
 /* V : Video */
-public class V
+public static class V
 { 
     /* SCR : Screen : refers to the low-res virtual screen */
     const int SCR_WIDTH = 320;
