@@ -16,7 +16,6 @@ public static partial class SD
     {
         WAD.Init();
         V.Init();
-
         /* all systems nominal*/
 
         /* thunderbirds are go */
