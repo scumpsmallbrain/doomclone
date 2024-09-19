@@ -4,5 +4,4 @@ obj/**
 obj
 .vscode/**
 .vscode
-wad/**
-wad
+wad/*.wad
