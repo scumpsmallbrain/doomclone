@@ -106,6 +106,7 @@ public static partial class WAD
                     );
                 
             }
+            
             if ( nameIndex[mid].Name.CompareTo(lumpName) < 0 ) // less than
                 return binSearchLumps( lumpName, start, mid );
             
