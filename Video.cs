@@ -38,7 +38,7 @@ public static class V
         /* initialize window, virtual cameras, render texture */
         Window.Init( WIN_WIDTH, WIN_HEIGHT, SD.V_TITLE );
         // TODO: make window resizable w/ black bars
-        virtualCamera.Zoom = 1;
+        virtualCamera.Zoom = 0.1f;
         screenCamera.Zoom = 1;
         renderTexture = RenderTexture2D.Load(SCR_WIDTH, SCR_HEIGHT);
         /* i don't exactly understand this, but it works [[https://raw.githubusercontent.com/raysan5/raylib/refs/heads/master/examples/core/core_smooth_pixelperfect.c]] */
@@ -55,8 +55,7 @@ public static class V
             Graphics.ClearBackground(Color.Black);
             Graphics.BeginMode2D(virtualCamera);
                 //TODO: Rendering Code
-                Graphics.DrawCircle(120, 200, 40, Color.White);
-                Graphics.DrawCircle(200, 120, 30, Color.White);
+                AutoMap.Draw();
             Graphics.EndMode2D();
         Graphics.EndTextureMode();
 

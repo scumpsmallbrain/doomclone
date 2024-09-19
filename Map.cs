@@ -11,17 +11,17 @@ public struct Vert(Int16 x, Int16 y)
 }
 
 public struct LineDef
-		(	UInt16 start, UInt16 end, LineDef.Flag flags,
+		(	UInt16 start, UInt16 end /*, LineDef.Flag flags,
 			LineDef.Special specials, UInt16 targetSector,
-			UInt16 frontSideDef, UInt16 backSideDef 		)
+			UInt16 frontSideDef, UInt16 backSideDef */ 		)
 {
 	public UInt16 Start = start;
 	public UInt16 End = end;
-	public Flag Flags = flags;
-	public Special Specials = specials;
-	public UInt16 TargetSector = targetSector;
-	public UInt16 FrontSideDef = frontSideDef;
-	public UInt16 BackSideDef = backSideDef;
+	// public Flag Flags = flags;
+	// public Special Specials = specials;
+	// public UInt16 TargetSector = targetSector;
+	// public UInt16 FrontSideDef = frontSideDef;
+	// public UInt16 BackSideDef = backSideDef;
 
 	[Flags]
 	public enum Flag
@@ -57,4 +57,44 @@ public class Map(Vert[] verts, LineDef[] lineDefs)
 {
 	public Vert[] Verts = verts;
 	public LineDef[] LineDefs = lineDefs;
+}
+
+public static class MapLoader
+{
+	public static Map Load( Lump mapMarker )
+	{
+		Vert[] verts;
+		if (WAD.Dir.SearchNextLump("VERTEXES", mapMarker.Index, out Lump vLump))
+		{
+			int vertCount = vLump.Buffer.Length / 4;
+			verts = new Vert[vertCount];
+			for ( int i = 0; i < vertCount; i++ ) {
+				int ofs = i * 4;
+				verts[i] = new Vert(
+					WAD.I16(vLump.Buffer, ofs),
+					WAD.I16(vLump.Buffer, ofs + 0x02)
+				);
+				Console.WriteLine($"V{i}:{{{verts[i].X},{verts[i].Y}}}");
+			}
+		}
+		else throw new Exception($"VERTEXES lump not found in map {mapMarker.Name}");
+		
+		LineDef[] lineDefs;
+		if (WAD.Dir.SearchNextLump("LINEDEFS", mapMarker.Index, out Lump lLump))
+		{
+			int ldCount = lLump.Buffer.Length / 14;
+			lineDefs = new LineDef[ldCount];
+			for ( int i = 0; i < ldCount; i++ ) {
+				int ofs = i * 14;
+				lineDefs[i] = new LineDef(
+					WAD.U16(lLump.Buffer, ofs),
+					WAD.U16(lLump.Buffer, ofs + 0x02)
+				);
+				Console.WriteLine($"L{i}:{{{lineDefs[i].Start},{lineDefs[i].End}}}");
+			}
+		}
+		else throw new Exception($"LINEDEFS lump not found in map {mapMarker.Name}");
+
+		return new Map(verts, lineDefs);
+	}
 }

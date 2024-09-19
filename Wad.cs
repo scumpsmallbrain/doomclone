@@ -4,6 +4,7 @@
 using System.Text;
 using System.Text.RegularExpressions;
 using System.Collections.Generic;
+using System.Security.Cryptography.X509Certificates;
 
 namespace ScumpDoom;
 
@@ -13,8 +14,8 @@ public static partial class WAD
     // TODO: support PWADs
     //TODO: make this all an instance class
     static string IWADPath = "wad/DOOM.WAD";
-    static Header     Head;
-    static Directory  Dir;
+    static Header    Head;
+    public static Directory Dir;
     static WADReader Reader = new(IWADPath);
 
     [GeneratedRegex("(E\\d+M\\d+)|(MAP\\d\\d)")]
@@ -27,7 +28,6 @@ public static partial class WAD
         Head = new( Str(head, 0x0, 4), Int(head, 0x4), Int(head, 0x8) );
         /* read directory */
         Dir = new();
-        
     }
 
     /* points to directory :3 */
@@ -39,10 +39,12 @@ public static partial class WAD
     }
 
     /* points to alllll da lumps in da file */
-    struct Directory
+    public struct Directory
+    // TODO: make any of this make sense... please.....
     {
         readonly Entry[] list;
         readonly (string Name, int Index)[] nameIndex;
+        public readonly List<(string Name, int Index)> MapNames = new(32);
 
         public Directory()
         {
@@ -51,6 +53,7 @@ public static partial class WAD
             /* load lumps */
             list = new Entry[Head.NumLumps];
             nameIndex = new (string Name, int Index)[Head.NumLumps];
+            MapNames = [];
             int lump_counter = 0;
             for (int i = 0; i < Head.NumLumps * 16; i += 16) {
                 
@@ -60,6 +63,9 @@ public static partial class WAD
                 list[lump_counter] = new Entry( Int(buf, i+0x0), Int(buf, i+0x4), lump_name );
                 /* add lump's name to search index */
                 nameIndex[lump_counter] = (lump_name, lump_counter);
+
+                if (MapLumpCheck().IsMatch(lump_name))
+                    MapNames.Add((lump_name, lump_counter));
 
                 lump_counter++;
             }
@@ -86,31 +92,55 @@ public static partial class WAD
 
         private Lump[] binSearchLumps( string lumpName, int start, int end )
         {
-            if (start == end)
+            if (end - start <= 1)
                 return [];
 
             int mid = ((end - start) / 2) + start;
             if ( nameIndex[mid].Name == lumpName ) {
                 // FIXME: insane idiot code i did while distracted in class
-                Lump[] lumps = [];
+                Lump[] lumps = new Lump[32];
                 int i = mid;
                 while ( i - 1 >= 0 )
                     if ( nameIndex[i-1].Name == lumpName )
                         i--;
                     else break;
-                for ( int j = 0; nameIndex[i].Name == lumpName; i++ )
+                for ( int j = 0; nameIndex[i].Name == lumpName && j < 32; i++ )
                     lumps[j++] = new Lump(
                         lumpName,
-                        Reader.ReadLump(list[nameIndex[i].Index].Offset, list[nameIndex[i].Index].Size),
+                        Reader.ReadLump(
+                                list[nameIndex[i].Index].Offset,
+                                list[nameIndex[i].Index].Size),
                         nameIndex[i].Index
                     );
                 
             }
             
-            if ( nameIndex[mid].Name.CompareTo(lumpName) < 0 ) // less than
+            if ( nameIndex[mid].Name.CompareTo(lumpName) > 0 )
                 return binSearchLumps( lumpName, start, mid );
             
             return binSearchLumps( lumpName, mid, end );
+        }
+
+        /* given a lump index, find the next lump with a certain name */
+        public bool SearchNextLump( string lumpName, int index, out Lump lump )
+        {
+            for ( int i = index + 1; i < Head.NumLumps; i++ ) {
+                if ( list[i].LumpName == lumpName ) {
+                    lump = new Lump( list[i].LumpName, Reader.ReadLump(list[i].Offset, list[i].Size), i );
+                    return true;
+                }
+            }
+            lump = new Lump();
+            return false;
+        }
+
+        public Lump GetLump(int index)
+        {
+            return new Lump(
+                list[index].LumpName,
+                Reader.ReadLump(list[index].Offset, list[index].Size),
+                index
+            );
         }
 
     }
@@ -127,7 +157,7 @@ public static partial class WAD
     }
 
     /* read int16 from bytes */
-    public static int I16( byte[] arr, int offset )
+    public static Int16 I16( byte[] arr, int offset )
     {   
         byte[] buf = arr[offset..(offset+2)];
         
@@ -138,7 +168,7 @@ public static partial class WAD
     }
 
     /* read int16 from bytes */
-    public static int U16( byte[] arr, int offset )
+    public static UInt16 U16( byte[] arr, int offset )
     {   
         byte[] buf = arr[offset..(offset+2)];
         

@@ -16,6 +16,7 @@ public static partial class SD
     {
         WAD.Init();
         V.Init();
+        AutoMap.Init();
         /* all systems nominal*/
 
         /* thunderbirds are go */
@@ -25,6 +26,7 @@ public static partial class SD
     static void DoomLoop() {
         while ( !Window.ShouldClose() )
         {
+            AutoMap.Update();
             V.Draw();
         }
         Window.Close();
