@@ -37,7 +37,7 @@ public static class AutoMap
 			Graphics.DrawLine(	start.X - (int)ViewOffset.X,
 								-start.Y + (int)ViewOffset.Y,
 								end.X - (int)ViewOffset.X,
-								-end.Y + (int)ViewOffset.Y, Color.Red);
+								-end.Y + (int)ViewOffset.Y, Color.Red	);
 		}
 	}
 }
